@@ -350,6 +350,7 @@ class AsyncWorker : public solver::MinibatchWorker {
     shuffle_       = conf_.rand_shuffle();
     concurrent_mb_ = conf_.max_concurrency();
     neg_sampling_  = conf_.neg_sampling();
+    nt_            = conf_.num_threads();
     for (int i = 0; i < conf.embedding_size(); ++i) {
       if (conf.embedding(i).dim() > 0) {
         do_embedding_ = true; break;
