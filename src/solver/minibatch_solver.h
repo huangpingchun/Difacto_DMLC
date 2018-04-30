@@ -94,6 +94,7 @@ class MinibatchScheduler : public IterScheduler {
     }
 
     int cur_iter = 0;
+    /*
     if (model_in_.size()) {
       if (load_iter_ > 0) {
         printf("Loading model from iter = %d\n", load_iter_);
@@ -112,7 +113,32 @@ class MinibatchScheduler : public IterScheduler {
       printf("Prediction is finished!\n");
       return true;
     }
-
+    */
+   if (is_predict && model_in_.size()) {
+      if (load_iter_ > 0) {
+        printf("Loading model from iter = %d\n", load_iter_);
+        cur_iter = load_iter_;
+      } else {
+        printf("Loading the last model\n");
+        cur_iter = -1; 
+      }   
+      Wait(LoadModel(model_in_, cur_iter));
+      Iterate(cur_iter, Workload::PRED);
+      printf("Prediction is finished!\n");
+      return true;
+    }   
+    //continue training
+    if (!is_predict && model_in_.size()) {
+        if (load_iter_ > 0) {
+            printf("Loading model from iter (for continue training) = %d\n", load_iter_);
+            cur_iter = load_iter_;
+        } else {
+            printf("Loading the last model for continue training\n");
+            cur_iter = -1; 
+        }   
+        Wait(LoadModel(model_in_, cur_iter));
+        ++ cur_iter;
+    }
     for (; cur_iter < max_data_pass_; ++cur_iter) {
       if (Iterate(cur_iter, Workload::TRAIN) || Iterate(cur_iter, Workload::VAL)) {
         printf("Hit stop critera\n"); break;
